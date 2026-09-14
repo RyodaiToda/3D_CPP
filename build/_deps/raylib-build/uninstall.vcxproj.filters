@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\CMakeFiles\4138fea655e77c3a4d9f30295bc9da73\uninstall.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-build\CMakeFiles\uninstall" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{059E8704-516A-341F-B9A9-D4DD1C76D478}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

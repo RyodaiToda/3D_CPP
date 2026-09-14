@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\6f8c0f9f29d4f9a1ff1348f9426d4b08\raylib-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\58e976807da09b0be30c7f728211fee4\raylib-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\dc40a79eb0967d5212317c0c689d0452\raylib-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\_deps\raylib-subbuild\CMakeFiles\raylib-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{DD63E2A9-40A2-3C3A-B0D2-38FD99DBCBAE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

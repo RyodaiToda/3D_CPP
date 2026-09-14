@@ -7,8 +7,8 @@
             "cppStandard": "c++17",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/build-fresh/_deps/raylib-src/src",
-                "C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/build-fresh/_deps/raylib-build/raylib/include"
+                "${workspaceFolder}/../build-vs18/_deps/raylib-src/src",
+                "${workspaceFolder}/../build-vs18/_deps/raylib-build/raylib/include"
             ]
         }
     ],
