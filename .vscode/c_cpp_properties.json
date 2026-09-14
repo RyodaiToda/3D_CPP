@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "MinGW",
+            "compilerPath": "C:/Users/ryou0/mingw64/bin/g++.exe",
+            "intelliSenseMode": "windows-gcc-x64",
+            "cppStandard": "c++17",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/build-fresh/_deps/raylib-src/src",
+                "C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/build-fresh/_deps/raylib-build/raylib/include"
+            ]
+        }
+    ],
+    "version": 4
+}
