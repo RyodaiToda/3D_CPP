@@ -1,4 +1,4 @@
-C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/test/build/CMakeFiles/test_app.dir
+C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/test/build/CMakeFiles/test.dir
 C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/test/build/CMakeFiles/PACKAGE.dir
 C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/test/build/CMakeFiles/INSTALL.dir
 C:/Users/ryou0/OneDrive - OUMail (The University of Osaka)/プログラミング/3D_CPP/test/build/CMakeFiles/ALL_BUILD.dir

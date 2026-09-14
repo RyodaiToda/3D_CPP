@@ -16,5 +16,5 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
-add_executable(test_app test.cpp)
-target_link_libraries(test_app PRIVATE raylib)
+add_executable(test test.cpp)
+target_link_libraries(test PRIVATE raylib)

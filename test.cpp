@@ -1,7 +1,7 @@
 #include "raylib.h"
 
 int main() {
-    InitWindow(1280, 720, "minimal");
+    InitWindow(1280, 720,"New Title");
     SetTargetFPS(60);
 
     Camera3D cam{};
@@ -25,10 +25,11 @@ int main() {
         ClearBackground(Color{28, 30, 38, 255});
 
         BeginMode3D(cam);
-            DrawSphere(Vector3{0, y, 0}, 0.5f, RED);
+            DrawSphere(Vector3{0, y, 0}, 0.5f, GREEN);
             DrawGrid(20, 1.0f);
         EndMode3D();
 
+        // DrawFPS(10, 10);
         DrawText(TextFormat("y = %.2f  vy = %.2f", y, vy), 20, 20, 20, RAYWHITE);
         EndDrawing();
     }

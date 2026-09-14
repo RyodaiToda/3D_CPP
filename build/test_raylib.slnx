@@ -11,7 +11,7 @@
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="_deps/raylib-build/raylib/external/glfw/src/glfw.vcxproj"/>
 	</Project>
-	<Project Path="test_app.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6fa17c72-64e3-3c77-bf0a-9b5009a1cc7f">
+	<Project Path="test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d5145085-e335-3341-ab10-0fb69600c45c">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="_deps/raylib-build/raylib/external/glfw/src/glfw.vcxproj"/>
 		<BuildDependency Project="_deps/raylib-build/raylib/raylib.vcxproj"/>
@@ -28,7 +28,7 @@
 			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 			<BuildDependency Project="_deps/raylib-build/raylib/external/glfw/src/glfw.vcxproj"/>
 			<BuildDependency Project="_deps/raylib-build/raylib/raylib.vcxproj"/>
-			<BuildDependency Project="test_app.vcxproj"/>
+			<BuildDependency Project="test.vcxproj"/>
 		</Project>
 		<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="49fc5f28-4dbc-3ccd-aab7-46fcdb813a5f">
 			<BuildDependency Project="ALL_BUILD.vcxproj"/>
