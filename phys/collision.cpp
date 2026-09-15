@@ -25,6 +25,107 @@ namespace phys
         }
     }
 
+    static void boxFaceVertices(const RigidBody *b, int axis, float sign, Vec3 out[4])
+    {
+        Mat3 R = b->orientation.toMat3();
+        Vec3 he = b->shape.halfExtents;
+
+        int u = (axis + 1) % 3;
+        int v = (axis + 2) % 3;
+
+        Vec3 center = b->position + R.col(axis) * (sign * he[axis]);
+        Vec3 du = R.col(u) * he[u];
+        Vec3 dv = R.col(v) * he[v];
+
+        out[0] = center - du - dv;
+        out[1] = center + du - dv;
+        out[2] = center + du + dv;
+        out[3] = center - du + dv;
+    }
+
+    // 平面 dot(n, p) <= d の内側で多角形をクリップ（Sutherland–Hodgman）
+    static int clipPolygonByPlane(const Vec3 *in, int n, const Vec3 &planeN, float planeD, Vec3 *out)
+    {
+        int outCount = 0;
+        for (int i = 0; i < n; i++)
+        {
+            const Vec3 &cur = in[i];
+            const Vec3 &next = in[(i + 1) % n];
+
+            float dCur = dot(planeN, cur) - planeD;
+            float dnext = dot(planeN, next) - planeD;
+
+            if (dCur <= 0.0f)
+                out[outCount++] = cur;
+
+            if ((dCur < 0.0f && dnext > 0.0f) || (dCur > 0.0f && dnext < 0.0f))
+            {
+                float t = dCur / (dCur - dnext);
+                out[outCount++] = cur + (next - cur) * t;
+            }
+        }
+        return outCount;
+    }
+
+    static void reduceContacts(Vec3 *pts, float *depths, int &count)
+    {
+        if (count <= MAX_CONTACT_POINTS)
+        {
+            return;
+        }
+
+        int chosen[MAX_CONTACT_POINTS];
+        bool used[32] = {false};
+
+        int best = 0;
+        for (int i = 1; i < count; i++)
+        {
+            if (depths[i] > depths[best])
+                best = i;
+        }
+        chosen[0] = best;
+        used[best] = true;
+
+        for (int k = 1; k < MAX_CONTACT_POINTS; ++k)
+        {
+            int pick = -1;
+            float pickDist = -1.0f;
+            for (int i = 0; i < count; i++)
+            {
+                if (used[i])
+                    continue;
+                float minD = FLT_MAX;
+                for (int j = 0; j < k; j++)
+                {
+                    minD = std::min(minD, lengthSq(pts[i] - pts[chosen[j]]));
+                }
+                if (minD > pickDist)
+                {
+                    pickDist = minD;
+                    pick = i;
+                }
+            }
+            chosen[k] = pick;
+            used[pick] = true;
+        }
+
+        Vec3 tempP[MAX_CONTACT_POINTS];
+        float tempD[MAX_CONTACT_POINTS];
+
+        for (int k = 0; k < MAX_CONTACT_POINTS; k++)
+        {
+            tempP[k] = pts[chosen[k]];
+            tempD[k] = depths[chosen[k]];
+        }
+        for (int k = 0; k < MAX_CONTACT_POINTS; k++)
+        {
+            pts[k] = tempP[k];
+            depths[k] = tempD[k];
+        }
+        count = MAX_CONTACT_POINTS;
+    }
+    // static inline Vec3 toLocal
+
     static bool collideSphereSphere(RigidBody *a, RigidBody *b, Manifold &m)
     {
         Vec3 d = b->position - a->position;
@@ -116,7 +217,7 @@ namespace phys
         m.contacts[0].position = contactPoint;
 
         return true;
-    }
+        }
 
     static bool collideBoxBox(RigidBody *A, RigidBody *B, Manifold &m)
     {
@@ -142,7 +243,6 @@ namespace phys
         // SAT
         int bestType = -1, bestI = 0, bestJ = 0;
         float bestOverlap = FLT_MAX;
-        float bestScore = FLT_MAX;
 
         // A
         for (int i = 0; i < 3; i++)
@@ -152,9 +252,8 @@ namespace phys
             float overlap = ra + rb - std::fabs(t[i]);
             if (overlap < 0.0f)
                 return false;
-            if (overlap < bestScore)
+            if (overlap < bestOverlap)
             {
-                bestScore = overlap;
                 bestOverlap = overlap;
                 bestType = 0;
                 bestI = i;
@@ -170,10 +269,8 @@ namespace phys
             float overlap = ra + rb - proj;
             if (overlap < 0.0f)
                 return false;
-            float score = overlap * 1.005f + 1e-4f;
-            if (score < bestScore)
+            if (overlap < bestOverlap)
             {
-                bestScore = score;
                 bestOverlap = overlap;
                 bestType = 1;
                 bestJ = j;
@@ -203,10 +300,8 @@ namespace phys
 
                 float invLen = 1.0f / std::sqrt(axisLen2);
                 float realOverlap = overlap * invLen;
-                float score = realOverlap * 1.05f + 1e-3f;
-                if (score < bestScore)
+                if (realOverlap < bestOverlap)
                 {
-                    bestScore = score;
                     bestOverlap = realOverlap;
                     bestType = 2;
                     bestI = i;
@@ -278,6 +373,8 @@ namespace phys
             {
                 float s = (b * f - c) / denom;
                 float u = (f - b * c) / denom;
+                s = clampf(s, -ea[bestI], ea[bestI]);
+                u = clampf(u, -eb[bestJ], eb[bestJ]);
                 point = ((pA + eAxis * s) + (pB + fAxis * u)) * 0.5f;
             }
 
@@ -389,106 +486,7 @@ namespace phys
         return true;
     }
 
-    static void boxFaceVertices(const RigidBody *b, int axis, float sign, Vec3 out[4])
-    {
-        Mat3 R = b->orientation.toMat3();
-        Vec3 he = b->shape.halfExtents;
 
-        int u = (axis + 1) % 3;
-        int v = (axis + 2) % 3;
-
-        Vec3 center = b->position + R.col(axis) * (sign * he[axis]);
-        Vec3 du = R.col(u) * he[u];
-        Vec3 dv = R.col(v) * he[v];
-
-        out[0] = center - du - dv;
-        out[1] = center + du - dv;
-        out[2] = center + du + dv;
-        out[3] = center - du + dv;
-    }
-
-    // 平面 dot(n, p) <= d の内側で多角形をクリップ（Sutherland–Hodgman）
-    static int clipPolygonByPlane(const Vec3 *in, int n, const Vec3 &planeN, float planeD, Vec3 *out)
-    {
-        int outCount = 0;
-        for (int i = 0; i < n; i++)
-        {
-            const Vec3 &cur = in[i];
-            const Vec3 &next = in[(i + 1) % n];
-
-            float dCur = dot(planeN, cur) - planeD;
-            float dnext = dot(planeN, next) - planeD;
-
-            if (dCur <= 0.0f)
-                out[outCount++] = cur;
-
-            if ((dCur < 0.0f && dnext > 0.0f) || (dCur > 0.0f && dnext < 0.0f))
-            {
-                float t = dCur / (dCur - dnext);
-                out[outCount++] = cur + (next - cur) * t;
-            }
-        }
-        return outCount;
-    }
-
-    static void reduceContacts(Vec3 *pts, float *depths, int &count)
-    {
-        if (count <= MAX_CONTACT_POINTS)
-        {
-            return;
-        }
-
-        int chosen[MAX_CONTACT_POINTS];
-        bool used[32] = {false};
-
-        int best = 0;
-        for (int i = 1; i < count; i++)
-        {
-            if (depths[i] > depths[best])
-                best = i;
-        }
-        chosen[0] = best;
-        used[best] = true;
-
-        for (int k = 1; k < MAX_CONTACT_POINTS; ++k)
-        {
-            int pick = -1;
-            float pickDist = -1.0f;
-            for (int i = 0; i < count; i++)
-            {
-                if (used[i])
-                    continue;
-                float minD = FLT_MAX;
-                for (int j = 0; j < k; j++)
-                {
-                    minD = std::min(minD, lengthSq(pts[i] - pts[chosen[j]]));
-                }
-                if (minD > pickDist)
-                {
-                    pickDist = minD;
-                    pick = i;
-                }
-            }
-            chosen[k] = pick;
-            used[pick] = true;
-        }
-
-        Vec3 tempP[MAX_CONTACT_POINTS];
-        float tempD[MAX_CONTACT_POINTS];
-
-        for (int k = 0; k < MAX_CONTACT_POINTS; k++)
-        {
-            tempP[k] = pts[chosen[k]];
-            tempD[k] = depths[chosen[k]];
-        }
-        for (int k = 0; k < MAX_CONTACT_POINTS; k++)
-        {
-            pts[k] = tempP[k];
-            depths[k] = tempD[k];
-        }
-        count = MAX_CONTACT_POINTS;
-    }
-    // static inline Vec3 toLocal
 
     bool collide(RigidBody *a, RigidBody *b, Manifold &m)
     {

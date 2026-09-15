@@ -297,6 +297,13 @@ namespace phys
                         m.contacts[i].normalImpulse = old.contacts[j].normalImpulse;
                         m.contacts[i].tangentImpulse[0] = old.contacts[j].tangentImpulse[0];
                         m.contacts[i].tangentImpulse[1] = old.contacts[j].tangentImpulse[1];
+
+                        Contact &c = m.contacts[i];
+                        Vec3 impulse = m.normal * c.normalImpulse +
+                                       m.tangent[0] * c.tangentImpulse[0] +
+                                       m.tangent[1] * c.tangentImpulse[1];
+                        m.bodyA->applyImpulse(-1.0f * impulse, c.rA);
+                        m.bodyB->applyImpulse(impulse, c.rB);
                         break;
                     }
                 }
@@ -314,8 +321,8 @@ namespace phys
         integrateForces(dt);
         broadphase();
         narrowphase();
-        warmStart();
         prepareConstraints(dt);
+        warmStart();
         solveVelocities();
         integratePositions(dt);
         correctPositions();

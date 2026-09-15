@@ -20,6 +20,7 @@ static inline Vec3 toPhys(const Vector3 &v) { return Vec3{v.x, v.y, v.z}; }
 struct Demo
 {
     World world;
+    std::vector<Color> colors;
 
     Model cubeModel{};
     Model sphereModel{};
@@ -27,17 +28,17 @@ struct Demo
     RigidBody *addBox(const Vec3 &pos, const Vec3 &he, float mass, Color c)
     {
         RigidBody *b = world.createBox(pos, he, mass);
-        // if ((int)colors.size() <= b->id)
-        //     colors.resize(b->id + 1, WHITE);
-        // colors[b->id] = c;
+        if (static_cast<int>(colors.size()) <= b->id)
+            colors.resize(b->id + 1, WHITE);
+        colors[b->id] = c;
         return b;
     }
     RigidBody *addSphere(const Vec3 &pos, float r, float mass, Color c)
     {
         RigidBody *b = world.createSphere(pos, r, mass);
-        // if ((int)colors.size() <= b->id)
-        //     colors.resize(b->id + 1, WHITE);
-        // colors[b->id] = c;
+        if (static_cast<int>(colors.size()) <= b->id)
+            colors.resize(b->id + 1, WHITE);
+        colors[b->id] = c;
         return b;
     }
     void addGround()
@@ -50,9 +51,10 @@ struct Demo
     void buildScene()
     {
         world.clear();
+        colors.clear();
         addGround();
         RigidBody *b = addBox(Vec3{0, 2, 0}, Vec3{1, 1, 1}, 1.0f, WHITE);
-        RigidBody *s = addSphere(Vec3{2, 5, 0}, 0.5f, 1.0f, BLUE);
+        RigidBody *s = addSphere(Vec3{1, 5, 0}, 0.5f, 1.0f, BLUE);
     }
 
     void draw()
@@ -69,15 +71,14 @@ struct Demo
 
             if (body->shape.type == ShapeType::Box)
             {
-                // cout<<"yaha";
                 Vector3 scale = toRay(body->shape.halfExtents * 2.0f);
-                DrawModelEx(cubeModel, pos, axis, angle * RAD2DEG, scale, RED);
+                DrawModelEx(cubeModel, pos, axis, angle * RAD2DEG, scale, colors[body->id]);
             }
             else if (body->shape.type == ShapeType::Sphere)
             {
                 float r = body->shape.radius;
                 Vector3 scale{r, r, r};
-                DrawModelEx(sphereModel, pos, axis, angle * RAD2DEG, scale, BLUE);
+                DrawModelEx(sphereModel, pos, axis, angle * RAD2DEG, scale, colors[body->id]);
             }
         }
     }
@@ -94,7 +95,7 @@ int main()
     demo.cubeModel = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
     demo.sphereModel = LoadModelFromMesh(GenMeshSphere(1.0f, 14, 20));
     demo.buildScene();
-    cout << demo.world.bodyCount() << endl;
+    // cout << demo.world.bodyCount() << endl;
 
     // --- カメラ（球面座標で手動制御） ---
     float camYaw = 0.9f, camPitch = 0.28f;
@@ -105,8 +106,6 @@ int main()
     camera.up = Vector3{0, 1, 0};
     camera.fovy = 50.0f;
     camera.projection = CAMERA_PERSPECTIVE;
-
-    float y = 8.0f, vy = 0.0f;
 
     while (!WindowShouldClose())
     {
@@ -148,7 +147,7 @@ int main()
         EndMode3D();
 
         // DrawFPS(10, 10);
-        DrawText(TextFormat("y = %.2f  vy = %.2f", y, vy), 20, 20, 20, RAYWHITE);
+        DrawText(TextFormat("box y = %.2f", demo.world.getBodies()[1]->position.y), 20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
