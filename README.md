@@ -14,7 +14,8 @@ raylib は描画のみに使用します。
 | 剛体 | `phys/body.h` | 質量・慣性テンソル・形状・力積の適用 |
 | 衝突判定 | `phys/collision.{h,cpp}` | 接触点と法線の生成（narrow phase） |
 | ワールド | `phys/world.{h,cpp}` | 時間積分・broad phase・接触ソルバ |
-| デモ | `test.cpp` | シーン構築・描画・カメラ操作 |
+| デモ | `test.cpp` | ドミノのシーン（`test` ターゲット） |
+| ゲーム | `game.cpp` | FPS 視点の当たり判定検証（`game` ターゲット） |
 
 ## Demo scene
 
@@ -62,6 +63,65 @@ Sequential impulse による反復解法です。
 - **反発** — 接近速度が `restitutionThreshold` 未満のときは無効化し、静止時の微小バウンドを防ぐ
 - **位置補正** — 速度解決後に、`penetrationSlop` を超えためり込みだけを直接押し戻す
 
+## Physics Range（FPS 視点の当たり判定テスト）
+
+`game.cpp` は、当たり判定が本当に正しく動いているかを**歩いて・ぶつかって・撃って**確かめるための一人称ゲームです。
+
+![Physics Range](docs/game.png)
+
+12 個の的（レンガの壁の上に 3・ピラミッドの上に 1・塔の上に 1・手前のピン 7 本）をすべて倒せばクリア。タイムとショット数が出ます。
+
+プレイヤー自身も剛体（質量 5 kg の箱）なので、壁やレンガをすり抜けられません。転倒しないように慣性テンソルの逆行列をゼロにして回転だけ殺しています。接地判定は接触マニフォールドの法線から取っているので、ジャンプもソルバの結果に連動します。
+
+| 入力 | 動作 |
+|---|---|
+| `W` `A` `S` `D` | 移動 |
+| マウス | 視点 |
+| `Space` | ジャンプ（接地時のみ） |
+| `Shift` | ダッシュ |
+| 左クリック | 発射 |
+| `Q` | 弾を球／箱で切り替え |
+| `Tab` | **当たり判定のデバッグ表示** |
+| `R` | リセット |
+| `P` | 一時停止（カーソル解放） |
+
+### 当たり判定のデバッグ表示
+
+`Tab` で、ソルバが実際に使っている接触情報をそのまま描画します。
+
+![Collision debug view](docs/game-debug.png)
+
+| 色 | 意味 |
+|---|---|
+| 緑のワイヤーフレーム | 動的な剛体の AABB（broad phase が見ている箱） |
+| 灰色のワイヤーフレーム | 静的な剛体の AABB |
+| 赤い点 | 接触点 `Contact::position` |
+| 黄色い線 | 接触法線（`bodyA` → `bodyB` 向き） |
+| マゼンタの線 | 貫入量 `Contact::penetration` |
+
+AABB はワールド軸に平行なので、**傾いて見えたら遠近効果**、AABB が物体より明らかに大きければ実際に傾いている、と見分けられます（FOV が 72° と広いため、画面端の縦線は必ず傾いて見えます）。
+
+### 自己診断
+
+描画なしで物理だけを回し、当たり判定が破綻していないかを数値で検証できます。
+
+```powershell
+.\build\Debug\game.exe --selftest
+```
+
+```text
+[1] settle 3s (no input)        積み上げた箱が静止するか、床をすり抜けないか
+[2] fast projectile             26 m/s の弾が薄いピンを貫通しないか
+[3] shooting the structures     的が撃ち落とせるか、体が床下に落ちないか
+```
+
+1 枚だけ描画して PNG に保存することもできます（上の画像はこれで生成しています）。
+
+```powershell
+.\build\Debug\game.exe --shot out.png 90        # 90 フレーム分だけ物理を進めてから撮影
+.\build\Debug\game.exe --shot out.png 90 debug  # デバッグ表示つき
+```
+
 ## Requirements
 
 - Windows
@@ -81,23 +141,26 @@ PowerShell で、この README のあるフォルダを開きます。
 $cmake = "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 
 & $cmake -S . -B build -G "Visual Studio 18 2026"
-& $cmake --build build --config Debug --target test
+& $cmake --build build --config Debug
 ```
 
 `cmake` が PATH にある場合は次の形式でも実行できます。
 
 ```powershell
 cmake -S . -B build -G "Visual Studio 18 2026"
-cmake --build build --config Debug --target test
+cmake --build build --config Debug
 ```
+
+`--target test` / `--target game` で片方だけビルドできます。
 
 ## Run
 
 ```powershell
-.\build\Debug\test.exe
+.\build\Debug\test.exe    # ドミノのデモ
+.\build\Debug\game.exe    # Physics Range（FPS）
 ```
 
-## Controls
+## Controls（ドミノのデモ `test.exe`）
 
 | 入力 | 動作 |
 |---|---|
@@ -112,7 +175,8 @@ cmake --build build --config Debug --target test
 ```text
 .
 ├── CMakeLists.txt
-├── test.cpp              # シーン構築・描画・カメラ
+├── test.cpp              # ドミノのデモ
+├── game.cpp              # Physics Range（FPS・当たり判定検証）
 ├── phys/
 │   ├── math3d.h          # Vec3 / Mat3 / Quat / AABB
 │   ├── body.h            # RigidBody, Shape
@@ -121,7 +185,9 @@ cmake --build build --config Debug --target test
 │   ├── world.h
 │   └── world.cpp         # 積分・broad phase・接触ソルバ
 ├── docs/
-│   └── demo.gif
+│   ├── demo.gif
+│   ├── game.png
+│   └── game-debug.png
 └── build/                # CMake 生成物（Git 管理外）
 ```
 
@@ -146,11 +212,12 @@ cmake --build build --config Debug --target test
 ## Notes
 
 - `phys/` の `.cpp` は `CMakeLists.txt` の `test` ターゲットに追加が必要です。`.h` は各 `.cpp` から `#include` されるため追加は不要です。
-- ビルド時に **C4819** が出る場合、ソースが UTF-8 なのに MSVC が既定のコードページ（日本語環境では CP932）で読もうとしている警告です。ビルド自体は通りますが、消すには `CMakeLists.txt` に次を追加します。
+- ソースは UTF-8 です。MSVC は既定でロケールのコードページ（日本語環境では CP932）として読むため、`CMakeLists.txt` で `/utf-8` を指定しています。
 
   ```cmake
-  target_compile_options(test PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+  target_compile_options(${tgt} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
   ```
 
-  この警告を放置したまま日本語コメントを含むファイルを LF 改行で保存すると、コメントが次の行を巻き込んでビルドが壊れることがあります。
+  これを外すと **C4819** 警告が出ます。さらに悪いことに、日本語コメントを含むファイルを **LF 改行**で保存すると、コメント末尾の全角文字が直後の改行バイトを食べて次の行を巻き込み、ビルドが壊れます（CRLF なら CR が食べられて LF が残るため露見しません）。`/utf-8` を外さないでください。
+- `World::contactCount()` は `phys/world.h` で宣言されていますが**定義がありません**。呼ぶとリンクエラーになります（`game.cpp` ではマニフォールドから自前で数えています）。
 - 実行がアプリケーション制御ポリシーでブロックされる場合は、組織の管理者に実行許可を確認してください。C++ のコンパイルエラーとは別の問題です。

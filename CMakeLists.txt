@@ -23,3 +23,17 @@ add_executable(test
 )
 target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(test PRIVATE raylib)
+
+add_executable(game
+    game.cpp
+    phys/world.cpp
+    phys/collision.cpp
+)
+target_include_directories(game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(game PRIVATE raylib)
+
+# ソースは UTF-8。MSVC は既定でロケールのコードページ（日本語環境では CP932）
+# として読むため、指定しないと日本語コメント末尾が次の行を巻き込んで壊れる。
+foreach(tgt test game)
+    target_compile_options(${tgt} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+endforeach()
