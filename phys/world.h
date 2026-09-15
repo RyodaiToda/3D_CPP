@@ -15,7 +15,7 @@ namespace phys
     public:
         Vec3 gravity{0.0f, -9.81f, 0.0f};
         float restitutionThreshold = 1.0f; // これ未満の接近速度では反発させない
-        int velocityIterations = 15;
+        int velocityIterations = 10;
         int positionIterations = 3;      // めり込み補正の反復回数
         float penetrationSlop = 0.005f;  // 許容するめり込み量（ジッタ防止）
         float positionCorrection = 0.4f; // 1 反復で解消する割合
