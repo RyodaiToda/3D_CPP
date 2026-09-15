@@ -4,6 +4,7 @@
 
 namespace phys
 {
+    constexpr int MAX_CONTACT_POINTS = 4;
 
     struct Contact{
         Vec3 position{0.0f, 0.0f, 0.0f};

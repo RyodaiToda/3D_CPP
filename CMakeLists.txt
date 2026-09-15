@@ -16,5 +16,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
-add_executable(test test.cpp)
+add_executable(test
+    test.cpp
+    phys/world.cpp
+    phys/collision.cpp
+)
+target_include_directories(test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(test PRIVATE raylib)

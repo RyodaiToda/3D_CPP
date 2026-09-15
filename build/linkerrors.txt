@@ -1,0 +1,14 @@
+================================================================================
+Linker Errors
+Generated: 2026-09-14T06:29:35.091Z
+Total Errors: 3
+================================================================================
+
+[LNK2019] (MSVC)
+未解決の外部シンボル "public: struct phys::RigidBody * __cdecl phys::World::createBox(struct phys::Vec3 const &,struct phys::Vec3 const &,float)" (?createBox@World@phys@@QEAAPEAURigidBody@2@AEBUVec3@2@0M@Z) が関数 main で参照されました [C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\test.vcxproj]
+
+[LNK2019] (MSVC)
+未解決の外部シンボル "public: struct phys::RigidBody * __cdecl phys::World::createSphere(struct phys::Vec3 const &,float,float)" (?createSphere@World@phys@@QEAAPEAURigidBody@2@AEBUVec3@2@MM@Z) が関数 main で参照されました [C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\test.vcxproj]
+
+[LNK1120] (MSVC)
+2 件の未解決の外部参照 [C:\Users\ryou0\OneDrive - OUMail (The University of Osaka)\プログラミング\3D_CPP\test\build\test.vcxproj]

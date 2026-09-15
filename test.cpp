@@ -1,32 +1,150 @@
 #include "raylib.h"
 
-int main() {
-    InitWindow(1280, 720,"New Title");
+#include "raymath.h"
+#include "rlgl.h"
+#include "phys/world.h"
+#include <cmath>
+
+#include <iostream>
+#include <cstdio>
+#include <vector>
+using namespace phys;
+using namespace std;
+
+// ---------------------------------------------------------------------------
+// 変換ヘルパ
+// ---------------------------------------------------------------------------
+static inline Vector3 toRay(const Vec3 &v) { return Vector3{v.x, v.y, v.z}; }
+static inline Vec3 toPhys(const Vector3 &v) { return Vec3{v.x, v.y, v.z}; }
+
+struct Demo
+{
+    World world;
+
+    Model cubeModel{};
+    Model sphereModel{};
+
+    RigidBody *addBox(const Vec3 &pos, const Vec3 &he, float mass, Color c)
+    {
+        RigidBody *b = world.createBox(pos, he, mass);
+        // if ((int)colors.size() <= b->id)
+        //     colors.resize(b->id + 1, WHITE);
+        // colors[b->id] = c;
+        return b;
+    }
+    RigidBody *addSphere(const Vec3 &pos, float r, float mass, Color c)
+    {
+        RigidBody *b = world.createSphere(pos, r, mass);
+        // if ((int)colors.size() <= b->id)
+        //     colors.resize(b->id + 1, WHITE);
+        // colors[b->id] = c;
+        return b;
+    }
+    void addGround()
+    {
+        RigidBody *g = addBox({0, -1.0f, 0}, {15.0f, 1.0f, 15.0f}, 0.0f, Color{70, 75, 85, 255});
+        g->friction = 0.7f;
+        g->restitution = 0.1f;
+    }
+
+    void buildScene()
+    {
+        world.clear();
+        addGround();
+        RigidBody *b = addBox(Vec3{0, 2, 0}, Vec3{1, 1, 1}, 1.0f, WHITE);
+        RigidBody *s = addSphere(Vec3{2, 5, 0}, 0.5f, 1.0f, BLUE);
+    }
+
+    void draw()
+    {
+        for (const auto &body : world.getBodies())
+        {
+            Quaternion q{body->orientation.x, body->orientation.y, body->orientation.z, body->orientation.w};
+            Vector3 axis;
+            float angle;
+            QuaternionToAxisAngle(q, &axis, &angle);
+            if (Vector3Length(axis) < 1e-6f)
+                axis = Vector3{0, 1, 0};
+            Vector3 pos = toRay(body->position);
+
+            if (body->shape.type == ShapeType::Box)
+            {
+                // cout<<"yaha";
+                Vector3 scale = toRay(body->shape.halfExtents * 2.0f);
+                DrawModelEx(cubeModel, pos, axis, angle * RAD2DEG, scale, RED);
+            }
+            else if (body->shape.type == ShapeType::Sphere)
+            {
+                float r = body->shape.radius;
+                Vector3 scale{r, r, r};
+                DrawModelEx(sphereModel, pos, axis, angle * RAD2DEG, scale, BLUE);
+            }
+        }
+    }
+};
+
+int main()
+{
+    InitWindow(1280, 720, "New Title");
     SetTargetFPS(60);
 
-    Camera3D cam{};
-    cam.position   = Vector3{10, 8, 10};
-    cam.target     = Vector3{0, 2, 0};
-    cam.up         = Vector3{0, 1, 0};
-    cam.fovy       = 50.0f;
-    cam.projection = CAMERA_PERSPECTIVE;
+    const float FIXED_DT = 1.0f / 60.0f;
+
+    Demo demo;
+    demo.cubeModel = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+    demo.sphereModel = LoadModelFromMesh(GenMeshSphere(1.0f, 14, 20));
+    demo.buildScene();
+    cout << demo.world.bodyCount() << endl;
+
+    // --- カメラ（球面座標で手動制御） ---
+    float camYaw = 0.9f, camPitch = 0.28f;
+    float camDist = 24.0f;
+    Vector3 camTarget{0, 3.0, 0};
+
+    Camera3D camera{};
+    camera.up = Vector3{0, 1, 0};
+    camera.fovy = 50.0f;
+    camera.projection = CAMERA_PERSPECTIVE;
 
     float y = 8.0f, vy = 0.0f;
 
-    while (!WindowShouldClose()) {
-        // --- 更新（ここが後で world.step() になる）---
-        const float dt = 1.0f / 60.0f;
-        vy += -9.81f * dt;          // 速度を先に
-        y  += vy * dt;              // その速度で位置を
-        if (y < 0.5f) { y = 0.5f; vy = -vy * 0.6f; }   // 床で反発
+    while (!WindowShouldClose())
+    {
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+        {
+            Vector2 d = GetMouseDelta();
+            camYaw -= d.x * 0.005f;
+            camPitch += d.y * 0.005f;
+            camPitch = Clamp(camPitch, -1.45f, 1.45f);
+        }
+        camDist = Clamp(camDist - GetMouseWheelMove() * 1.8f, 4.0f, 90.0f);
+
+        if (IsKeyDown(KEY_A))
+        {
+            camTarget.x += 0.1;
+        }
+        if (IsKeyDown(KEY_D))
+        {
+            camTarget.x -= 0.1;
+        }
+
+        camera.target = camTarget;
+
+        camera.position = Vector3{
+            camTarget.x + camDist * cosf(camPitch) * sinf(camYaw),
+            camTarget.y + camDist * sinf(camPitch),
+            camTarget.z + camDist * cosf(camPitch) * cosf(camYaw)};
+
+        //    --- 更新（ここが後で world.step() になる）---
+        demo.world.step(FIXED_DT);
 
         // --- 描画 ---
         BeginDrawing();
         ClearBackground(Color{28, 30, 38, 255});
 
-        BeginMode3D(cam);
-            DrawSphere(Vector3{0, y, 0}, 0.5f, GREEN);
-            DrawGrid(20, 1.0f);
+        BeginMode3D(camera);
+        demo.draw();
+        DrawGrid(20, 1.0f);
         EndMode3D();
 
         // DrawFPS(10, 10);
