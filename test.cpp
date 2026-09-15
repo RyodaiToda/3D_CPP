@@ -25,6 +25,9 @@ struct Demo
     Model cubeModel{};
     Model sphereModel{};
 
+    float camTargetY = 3.0f; // シーンごとの推奨カメラ設定
+    float camDistance = 24.0f;
+
     RigidBody *addBox(const Vec3 &pos, const Vec3 &he, float mass, Color c)
     {
         RigidBody *b = world.createBox(pos, he, mass);
@@ -64,7 +67,7 @@ struct Demo
 
         // ドミノ列
         const int dominoCount = 12;
-        const float spacing = 0.72f;
+        const float spacing = 1.2f;
         const float startX = -5.2f;
         const float y = 1.15f;
 
@@ -161,6 +164,13 @@ int main()
             camTarget.y + camDist * sinf(camPitch),
             camTarget.z + camDist * cosf(camPitch) * cosf(camYaw)};
 
+        if (IsKeyPressed(KEY_R))
+        {
+            demo.buildScene();
+            camTarget.y = demo.camTargetY;
+            camDist = demo.camDistance;
+        }
+
         //    --- 更新（ここが後で world.step() になる）---
         demo.world.step(FIXED_DT);
 
@@ -174,7 +184,7 @@ int main()
         EndMode3D();
 
         // DrawFPS(10, 10);
-        DrawText(TextFormat("box y = %.2f", demo.world.getBodies()[1]->position.y), 20, 20, 20, RAYWHITE);
+        // DrawText(TextFormat("box y = %.2f", demo.world.getBodies()[1]->position.y), 20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
