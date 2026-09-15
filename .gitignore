@@ -1,0 +1,5 @@
+# Generated build outputs
+build/
+
+# Editor folders
+.vscode/
