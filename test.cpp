@@ -52,9 +52,36 @@ struct Demo
     {
         world.clear();
         colors.clear();
+
+        // 地面
         addGround();
-        RigidBody *b = addBox(Vec3{0, 2, 0}, Vec3{1, 1, 1}, 1.0f, WHITE);
-        RigidBody *s = addSphere(Vec3{1, 5, 0}, 0.5f, 1.0f, BLUE);
+
+        // 左右の壁で横に流れすぎないようにする
+        auto *wallL = addBox({-8.5f, 2.5f, 0.0f}, {0.5f, 2.5f, 8.0f}, 0.0f, Color{50, 55, 65, 255});
+        auto *wallR = addBox({8.5f, 2.5f, 0.0f}, {0.5f, 2.5f, 8.0f}, 0.0f, Color{50, 55, 65, 255});
+        wallL->restitution = 0.05f;
+        wallR->restitution = 0.05f;
+
+        // ドミノ列
+        const int dominoCount = 12;
+        const float spacing = 0.72f;
+        const float startX = -5.2f;
+        const float y = 1.15f;
+
+        for (int i = 0; i < dominoCount; ++i)
+        {
+            float x = startX + i * spacing;
+            float z = (i % 2 == 0) ? 0.0f : 0.1f;
+            auto *d = addBox({x, y, z}, {0.18f, 0.9f, 0.32f}, 1.0f, (i % 2 == 0) ? SKYBLUE : ORANGE);
+            d->friction = 0.9f;
+            d->restitution = 0.08f;
+            d->angularDamping = 0.06f;
+        }
+
+        // 最初に押す丸いボール
+        auto *ball = addSphere({-7.5f, 2.4f, 0.0f}, 0.55f, 2.0f, GOLD);
+        ball->velocity = {7.8f, 0.0f, 0.0f};
+        ball->friction = 0.15f;
     }
 
     void draw()
