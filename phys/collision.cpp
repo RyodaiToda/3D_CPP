@@ -217,7 +217,7 @@ namespace phys
         m.contacts[0].position = contactPoint;
 
         return true;
-        }
+    }
 
     static bool collideBoxBox(RigidBody *A, RigidBody *B, Manifold &m)
     {
@@ -243,6 +243,7 @@ namespace phys
         // SAT
         int bestType = -1, bestI = 0, bestJ = 0;
         float bestOverlap = FLT_MAX;
+        float bestScore = FLT_MAX;
 
         // A
         for (int i = 0; i < 3; i++)
@@ -252,8 +253,9 @@ namespace phys
             float overlap = ra + rb - std::fabs(t[i]);
             if (overlap < 0.0f)
                 return false;
-            if (overlap < bestOverlap)
+            if (overlap < bestScore)
             {
+                bestScore = overlap;
                 bestOverlap = overlap;
                 bestType = 0;
                 bestI = i;
@@ -269,8 +271,10 @@ namespace phys
             float overlap = ra + rb - proj;
             if (overlap < 0.0f)
                 return false;
-            if (overlap < bestOverlap)
+            float score = overlap * 1.005f + 1e-4f;
+            if (score < bestScore)
             {
+                bestScore=score;
                 bestOverlap = overlap;
                 bestType = 1;
                 bestJ = j;
@@ -300,8 +304,11 @@ namespace phys
 
                 float invLen = 1.0f / std::sqrt(axisLen2);
                 float realOverlap = overlap * invLen;
-                if (realOverlap < bestOverlap)
+                float score = realOverlap * 1.05f + 1e-3f;     // 面接触を優先（エッジは不安定になりやすい）
+
+                if (realOverlap < bestScore)
                 {
+                    bestScore=score;
                     bestOverlap = realOverlap;
                     bestType = 2;
                     bestI = i;
@@ -485,8 +492,6 @@ namespace phys
         finalizeContacts(m);
         return true;
     }
-
-
 
     bool collide(RigidBody *a, RigidBody *b, Manifold &m)
     {
