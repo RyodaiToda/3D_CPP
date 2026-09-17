@@ -595,7 +595,7 @@ int main(int argc, char **argv)
         if (!paused)
         {
             Vector2 md = GetMouseDelta();
-            g.yaw -= md.x * 0.0032f;
+            g.yaw += md.x * 0.0032f;
             g.pitch -= md.y * 0.0032f;
             g.pitch = Clamp(g.pitch, -1.45f, 1.45f);
 
