@@ -32,8 +32,17 @@ add_executable(game
 target_include_directories(game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(game PRIVATE raylib)
 
+# Python 実装（../../3D_claude_code）との比較ベンチ。描画しないので raylib 不要。
+# bench/README.md 参照。実行は bench/run_all.ps1。
+add_executable(bench
+    bench/bench_cpp.cpp
+    phys/world.cpp
+    phys/collision.cpp
+)
+target_include_directories(bench PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # ソースは UTF-8。MSVC は既定でロケールのコードページ（日本語環境では CP932）
 # として読むため、指定しないと日本語コメント末尾が次の行を巻き込んで壊れる。
-foreach(tgt test game)
+foreach(tgt test game bench)
     target_compile_options(${tgt} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 endforeach()

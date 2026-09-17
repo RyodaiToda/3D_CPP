@@ -1,0 +1,4 @@
+# GIF の元になる姿勢トレース。再生成できるうえ 1 本あたり数 MB あるので置かない。
+results/trace_*.json
+results/_*
+__pycache__/
